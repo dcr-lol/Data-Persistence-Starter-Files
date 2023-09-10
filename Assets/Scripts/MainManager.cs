@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static SharedState;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,6 +14,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,7 +22,19 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    public static MainManager Instance;
+
+    private void Awake()
+    {
+        if (Instance != null) { 
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +51,12 @@ public class MainManager : MonoBehaviour
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
             }
+        }
+
+        if (SharedState.Instance?.saveData?.bestScoreName?.Length > 0 && SharedState.Instance?.saveData?.bestScore > 0) ;
+        {
+            Debug.Log($"Hey {SharedState.Instance?.saveData?.bestScoreName} {SharedState.Instance?.saveData?.bestScore}");
+            BestScoreText.text = $"Best score: {SharedState.Instance.saveData.bestScoreName} : {SharedState.Instance.saveData.bestScore}";
         }
     }
 
@@ -70,7 +92,24 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        // save best score here
         m_GameOver = true;
         GameOverText.SetActive(true);
+        string path = Application.persistentDataPath + "/saveFile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+            data.bestScore = m_Points > data.bestScore ? m_Points : data.bestScore;
+            data.bestScoreName = m_Points > data.bestScore ? SharedState.Instance.playerName : data.bestScoreName;
+            string save = JsonUtility.ToJson(data);
+            File.WriteAllText(path, save);
+        } else { 
+            SaveData sd = new SaveData();
+            sd.bestScore = m_Points;
+            sd.bestScoreName= SharedState.Instance.playerName;
+            string save = JsonUtility.ToJson(sd);
+            File.WriteAllText(path, save);
+        }
     }
 }

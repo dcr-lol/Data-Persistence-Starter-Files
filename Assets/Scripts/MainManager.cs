@@ -38,6 +38,7 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log(BrickPrefab.gameObject.name);
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -95,21 +96,7 @@ public class MainManager : MonoBehaviour
         // save best score here
         m_GameOver = true;
         GameOverText.SetActive(true);
-        string path = Application.persistentDataPath + "/saveFile.json";
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
-            data.bestScore = m_Points > data.bestScore ? m_Points : data.bestScore;
-            data.bestScoreName = m_Points > data.bestScore ? SharedState.Instance.playerName : data.bestScoreName;
-            string save = JsonUtility.ToJson(data);
-            File.WriteAllText(path, save);
-        } else { 
-            SaveData sd = new SaveData();
-            sd.bestScore = m_Points;
-            sd.bestScoreName= SharedState.Instance.playerName;
-            string save = JsonUtility.ToJson(sd);
-            File.WriteAllText(path, save);
-        }
+        SharedState.Instance.SaveScore(m_Points);
     }
+
 }

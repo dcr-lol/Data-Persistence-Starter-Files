@@ -48,6 +48,30 @@ public class SharedState : MonoBehaviour
         playerName = userName;
     }
 
+    public void SaveScore(int m_Points)
+    {
+        string path = Application.persistentDataPath + "/saveFile.json";
+        if (File.Exists(path))
+        {
+            Debug.Log(path);
+            SaveData data = saveData;
+            bool newBestScore = m_Points > data.bestScore;
+            data.bestScore = newBestScore ? m_Points : data.bestScore;
+            data.bestScoreName = newBestScore ? SharedState.Instance.playerName : data.bestScoreName;
+            Debug.Log($"{data.bestScore} {data.bestScoreName} {SharedState.Instance.playerName}");
+            string save = JsonUtility.ToJson(data);
+            File.WriteAllText(path, save);
+        }
+        else
+        {
+            SaveData sd = new SaveData();
+            sd.bestScore = m_Points;
+            sd.bestScoreName = SharedState.Instance.playerName;
+            string save = JsonUtility.ToJson(sd);
+            File.WriteAllText(path, save);
+        }
+    }
+
     public class SaveData
     {
         public int bestScore;

@@ -24,17 +24,6 @@ public class MainManager : MonoBehaviour
 
     public static MainManager Instance;
 
-    private void Awake()
-    {
-        if (Instance != null) { 
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -54,7 +43,7 @@ public class MainManager : MonoBehaviour
             }
         }
 
-        if (SharedState.Instance?.saveData?.bestScoreName?.Length > 0 && SharedState.Instance?.saveData?.bestScore > 0) ;
+        if (SharedState.Instance?.saveData?.bestScoreName?.Length > 0 && SharedState.Instance?.saveData?.bestScore > 0)
         {
             Debug.Log($"Hey {SharedState.Instance?.saveData?.bestScoreName} {SharedState.Instance?.saveData?.bestScore}");
             BestScoreText.text = $"Best score: {SharedState.Instance.saveData.bestScoreName} : {SharedState.Instance.saveData.bestScore}";
@@ -80,7 +69,7 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene(0);
             }
         }
     }
